@@ -1,6 +1,7 @@
 import numpy as np
 from numpy import ndarray
 from typing import Tuple
+from scipy.special import logsumexp
 
 def assert_same_shape(arr: ndarray, arr_grad: ndarray) -> None:
 
@@ -19,3 +20,7 @@ def permute_data(X: ndarray, y: ndarray) -> Tuple[ndarray, ndarray]:
 
     perm = np.random.permutation(X.shape[0])
     return X[perm], y[perm]
+
+def softmax(x, axis=None):
+    
+    return np.exp(x - logsumexp(x, axis=axis, keepdims=True))
