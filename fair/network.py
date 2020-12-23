@@ -18,11 +18,11 @@ class NeuralNetwork:
                 setattr(layer, "seed", self.seed)
 
 
-    def forward(self, x_batch: ndarray) -> ndarray:
+    def forward(self, x_batch: ndarray, inference: bool = False) -> ndarray:
          
         x_out = x_batch
         for layer in self.layers:
-            x_out = layer.forward(x_out)
+            x_out = layer.forward(x_out, inference)
             
         return x_out
 
@@ -34,9 +34,9 @@ class NeuralNetwork:
             grad = layer.backward(grad)
 
 
-    def train_batch(self, x_batch: ndarray, y_batch: ndarray) -> float:
+    def train_batch(self, x_batch: ndarray, y_batch: ndarray, inference: bool = False) -> float:
 
-        predictions = self.forward(x_batch)
+        predictions = self.forward(x_batch, inference)
         loss = self.loss.forward(predictions, y_batch)
         self.backward(self.loss.backward())
 

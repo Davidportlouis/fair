@@ -28,7 +28,7 @@ class Linear(Operation):
         super().__init__()
 
 
-    def _output(self) -> ndarray:
+    def _output(self, inference) -> ndarray:
 
         return self.input_
 
@@ -45,13 +45,12 @@ class ReLU(Operation):
         super().__init__()
 
 
-    def _output(self) -> ndarray:
+    def _output(self, inference) -> ndarray:
 
         return np.maximum(0, self.input_)
 
 
-    def _input_grad(self, output_grad: ndarray) -> ndarray:
-
+    def _input_grad(self, output_grad: ndarray) -> ndarray: 
         return (self.output >= 0)  * output_grad 
 
 
@@ -63,29 +62,29 @@ class Tanh(Operation):
         super().__init__()
 
     
-    def _output(self) -> ndarray:
+    def _output(self, inference) -> ndarray:
 
-        return ((np.exp(self.input_) - np.exp(-self.input_)) / (np.exp(self.input_) + np.exp(self.input_)))
+        return np.tanh(self.input_)
 
     
     def _input_grad(self, output_grad: ndarray) -> ndarray:
 
-        return  (1-np.power(self.output, 2)) * output_grad
+        return  (1.0-np.power(self.output, 2)) * output_grad
 
 
 class LeakyReLU(Operation):
 
-    def __init__(self, alpha: float 0.2) -> None:
+    def __init__(self, alpha: float =  0.2) -> None:
 
         super().__init__()
         self.alpha: float = alpha
 
     
-    def _output(self) -> ndarray:
+    def _output(self, inference) -> ndarray:
 
-        return np.maximum(alpha * self.input_, self.input_)
+        return np.maximum(self.alpha * self.input_, self.input_)
 
     
     def _input_grad(self, output_grad: ndarray) -> ndarray:
 
-        return (np.ones_like(self.input_) if self.output > 0 else (np.ones_like(self.input_) * self.alpha)) * output_grad
+        return (np.ones_like(self.input_) if self.output.all() >= 0 else (np.ones_like(self.input_) * self.alpha)) * output_grad

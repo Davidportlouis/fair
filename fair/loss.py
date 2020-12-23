@@ -38,13 +38,17 @@ class Loss:
 class MSE(Loss):
 
 
-    def __init__(self):
+    def __init__(self, normalize: bool = False) -> None:
 
         super().__init__()
+        self.normalize = normalize
 
 
     def _output(self) -> float:
 
+        if self.normalize:
+            self.prediction /= self.prediction.sum(axis=1, keepdims=True)
+            
         return np.sum(np.power(self.prediction - self.target, 2)) / self.prediction.shape[0]
 
 
@@ -69,8 +73,8 @@ class SCE(Loss):
         self.softmax_preds = np.clip(softmax_preds, self.eps, 1-self.eps)
         loss = - (self.target * np.log(self.softmax_preds) + (1 - self.target) * np.log(1 - self.softmax_preds))
 
-        return np.sum(loss)
+        return np.sum(loss)/ self.prediction.shape[0]
 
     def _input_grad(self) -> ndarray:
 
-        return self.softmax_preds - self.target 
+        return (self.softmax_preds - self.target)/ self.prediction.shape[0] 
